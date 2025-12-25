@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Fortress - Secure Your Raspberry Pi in One Command</title>
+  <meta name="description" content="Automated security hardening script for Raspberry Pi. Configure firewall, SSH, fail2ban, and more with a single command.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <img src="icons/shield.svg" alt="" class="icon">
+            <span>Pi Fortress</span>
+          </div>
+
+          <h1>Transform your Pi into a fortress</h1>
+
+          <p class="hero-description">Comprehensive automated security hardening for Raspberry Pi. Hours of manual configuration, done in minutes. Lock it down.</p>
+
+          <div class="hero-buttons">
+            <a href="https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh" download class="btn btn-primary">
+              <img src="icons/download.svg" alt="" class="icon">
+              Download Script
+            </a>
+            <a href="https://github.com/Sharonhazan/pi-fortress" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+              <img src="icons/terminal.svg" alt="" class="icon">
+              View on GitHub
+            </a>
+          </div>
+        </div>
+
+   <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-buttons">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="terminal-title">pi@raspberrypi:~</div>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-line"><span class="prompt">$</span> sudo ./pi_fortress.sh</div>
+              <div class="terminal-line output"><b>Starting Pi Fortress...</b></div>
+              <div class="terminal-line output">✓ Updating system packages</div>
+              <div class="terminal-line output">✓ Hardening SSH configuration</div>
+              <div class="terminal-line output">✓ Setting up UFW firewall</div>
+              <div class="terminal-line output">✓ Installing Fail2Ban</div>
+              <div class="terminal-line output">✓ Installing security tools</div>
+              <div class="terminal-line output">✓ Applying network hardening</div>
+              <div class="terminal-line cursor"><span class="prompt">$</span> <span class="blink">_</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2>What gets configured</h2>
+
+      <div class="features-grid">
+        <div class="feature">
+          <img src="icons/lock.svg" alt="" class="icon">
+          <h3>SSH Hardening</h3>
+          <p>Root login disabled, strong encryption, key-based auth support</p>
+        </div>
+
+        <div class="feature">
+          <img src="icons/fire.svg" alt="" class="icon">
+          <h3>Firewall & Fail2Ban</h3>
+          <p>UFW firewall with default deny, intrusion prevention enabled</p>
+        </div>
+
+        <div class="feature">
+          <img src="icons/eye.svg" alt="" class="icon">
+          <h3>Rootkit Detection</h3>
+          <p>rkhunter, chkrootkit, and AIDE file integrity monitoring</p>
+        </div>
+
+        <div class="feature">
+          <img src="icons/bolt.svg" alt="" class="icon">
+          <h3>Auto Updates</h3>
+          <p>Unattended security patches keep your system protected</p>
+        </div>
+
+        <div class="feature">
+          <img src="icons/server.svg" alt="" class="icon">
+          <h3>Network Hardening</h3>
+          <p>SYN flood protection, IP spoofing prevention, secure sysctl</p>
+        </div>
+
+        <div class="feature">
+          <img src="icons/wifi.svg" alt="" class="icon">
+          <h3>Optional Disables</h3>
+          <p>Turn off Bluetooth and WiFi if not needed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Section -->
+  <section class="installation">
+    <div class="container">
+      <h2>Quick start</h2>
+      <p class="installation-description">Configure your Pi with Raspberry Pi Imager first (set username, password, enable SSH). Then run these commands. Takes ~5-10 minutes.</p>
+
+      <div class="code-blocks">
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCommand(this, 'wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh')">
+            <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
+            <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
+          </button>
+          <pre><code><span class="comment"># Download Pi Fortress</span>
+wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh</code></pre>
+        </div>
+
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCommand(this, 'chmod +x pi_fortress.sh')">
+            <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
+            <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
+          </button>
+          <pre><code><span class="comment"># Make it executable</span>
+chmod +x pi_fortress.sh</code></pre>
+        </div>
+
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCommand(this, 'sudo ./pi_fortress.sh')">
+            <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
+            <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
+          </button>
+          <pre><code><span class="comment"># Run as root</span>
+sudo ./pi_fortress.sh</code></pre>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <h3>What happens next</h3>
+        <ul>
+          <li><span class="bullet"></span> System packages get updated</li>
+          <li><span class="bullet"></span> SSH gets hardened with strong encryption</li>
+          <li><span class="bullet"></span> UFW firewall and Fail2Ban get configured</li>
+          <li><span class="bullet"></span> Security monitoring tools are installed</li>
+          <li><span class="bullet"></span> Network hardening is applied</li>
+          <li><span class="bullet"></span> Reboot and you're done</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>MIT License • Made by <a href="https://github.com/Sharonhazan" target="_blank" rel="noopener noreferrer">Sharon Hazan</a></p>
+        <div class="footer-links">
+          <a href="https://github.com/Sharonhazan/pi-fortress/issues" target="_blank" rel="noopener noreferrer">Report Issue</a>
+          <a href="https://github.com/Sharonhazan/pi-fortress" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function copyCommand(button, command) {
+      navigator.clipboard.writeText(command).then(() => {
+        const copyIcon = button.querySelector('.copy-icon');
+        const checkIcon = button.querySelector('.check-icon');
+        copyIcon.style.display = 'none';
+        checkIcon.style.display = 'block';
+        setTimeout(() => {
+          copyIcon.style.display = 'block';
+          checkIcon.style.display = 'none';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
