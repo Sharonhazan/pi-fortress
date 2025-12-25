@@ -358,7 +358,6 @@ This script implements security best practices but no system is 100% secure. Use
 ## 💬 Support
 
 - **Issues**: [Report bugs or request features](https://github.com/Sharonhazan/pi-fortress/issues)
-- **Discussions**: [Ask questions or share ideas](https://github.com/Sharonhazan/pi-fortress/discussions)
 - **Security Issues**: Report privately via GitHub Security Advisories
 
 ---
