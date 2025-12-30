@@ -256,14 +256,8 @@ print_status "Installing security tools..."
 apt install -y \
     rkhunter \
     chkrootkit \
-    aide \
     logwatch \
     auditd
-
-# Initialize AIDE database
-print_status "Initializing AIDE database (this may take a while)..."
-aideinit
-mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
 
 print_status "Security tools installed"
 
