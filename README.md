@@ -42,7 +42,6 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 ### 🔍 Monitoring & Detection
 - Rootkit detection (rkhunter, chkrootkit)
-- File integrity monitoring (AIDE)
 - System audit logging
 - Custom security check script
 
@@ -61,15 +60,14 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 ### Installation
 
 ```bash
-wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh
-```
+# Download the script
+wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh
 
-```bash
-chmod +x pi-fortress.sh
-```
+# Make it executable
+chmod +x pi_fortress.sh
 
-```bash
-sudo ./pi-fortress.sh
+# Run as root
+sudo ./pi_fortress.sh
 ```
 
 ### What to Expect
@@ -94,7 +92,6 @@ The script will:
 | `unattended-upgrades` | Automatic security updates |
 | `rkhunter` | Rootkit detection |
 | `chkrootkit` | Additional rootkit scanner |
-| `aide` | File integrity monitoring |
 | `logwatch` | Log analysis |
 | `auditd` | System auditing |
 
@@ -106,23 +103,25 @@ The script keeps password authentication enabled initially. After setting up SSH
 
 **On your local machine:**
 ```bash
+# Generate SSH key (if you don't have one)
 ssh-keygen -t ed25519 -C "your_email@example.com"
-```
 
-```bash
+# Copy to your Pi
 ssh-copy-id username@your-pi-ip
-```
 
-```bash
+# Test it works
 ssh username@your-pi-ip
 ```
 
 **Once working, disable password authentication:**
 ```bash
+# On your Pi
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-```
 
-```bash
+# Uncomment this line:
+PasswordAuthentication no
+
+# Restart SSH
 sudo systemctl restart ssh
 ```
 
@@ -182,46 +181,37 @@ This shows:
 ### Add Firewall Rules
 
 ```bash
+# Web server
 sudo ufw allow 80/tcp
-```
-
-```bash
 sudo ufw allow 443/tcp
-```
 
-```bash
+# Custom application
 sudo ufw allow 8080/tcp
-```
 
-```bash
+# Check status
 sudo ufw status numbered
 ```
 
 ### Check Fail2Ban
 
 ```bash
+# View status
 sudo fail2ban-client status sshd
-```
 
-```bash
+# See banned IPs
 sudo fail2ban-client status sshd | grep "Banned IP"
-```
 
-```bash
+# Unban an IP
 sudo fail2ban-client set sshd unbanip 192.168.1.100
 ```
 
 ### Manual Security Scans
 
 ```bash
+# Rootkit scan
 sudo rkhunter --check
-```
 
-```bash
-sudo aide --check
-```
-
-```bash
+# View auth log
 sudo tail -f /var/log/auth.log
 ```
 
@@ -253,10 +243,11 @@ sudo tail -f /var/log/auth.log
 
 **Option 1: Physical Access**
 ```bash
+# Connect keyboard/monitor
+# Login locally
+# Re-enable password auth
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-```
-
-```bash
+# Set: PasswordAuthentication yes
 sudo systemctl restart ssh
 ```
 
@@ -270,16 +261,17 @@ sudo systemctl restart ssh
 ### My IP Got Banned
 
 ```bash
+# From another IP or local access
 sudo fail2ban-client set sshd unbanip YOUR_IP
 ```
 
 ### Port Not Working
 
 ```bash
+# Check firewall
 sudo ufw status
-```
 
-```bash
+# Allow the port
 sudo ufw allow PORT_NUMBER/tcp
 ```
 
@@ -289,17 +281,10 @@ sudo ufw allow PORT_NUMBER/tcp
 
 ```bash
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-```
+# Add: Port 2222
 
-```bash
 sudo ufw allow 2222/tcp
-```
-
-```bash
 sudo ufw delete allow 22/tcp
-```
-
-```bash
 sudo systemctl restart ssh
 ```
 
@@ -307,13 +292,8 @@ sudo systemctl restart ssh
 
 ```bash
 sudo apt install mailutils
-```
-
-```bash
 sudo nano /etc/fail2ban/jail.local
-```
-
-```bash
+# Set: destemail = your@email.com
 sudo systemctl restart fail2ban
 ```
 
@@ -321,9 +301,7 @@ sudo systemctl restart fail2ban
 
 ```bash
 sudo nano /etc/sysctl.d/99-security.conf
-```
-
-```bash
+# Uncomment IPv6 disable lines
 sudo sysctl -p
 ```
 
@@ -375,6 +353,7 @@ This script implements security best practices but no system is 100% secure. Use
 ## 💬 Support
 
 - **Issues**: [Report bugs or request features](https://github.com/Sharonhazan/pi-fortress/issues)
+- **Discussions**: [Ask questions or share ideas](https://github.com/Sharonhazan/pi-fortress/discussions)
 - **Security Issues**: Report privately via GitHub Security Advisories
 
 ---
