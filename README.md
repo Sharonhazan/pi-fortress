@@ -59,14 +59,18 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 ### Installation
 
+**Download the script:**
 ```bash
-# Download the script
 wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh
+```
 
-# Make it executable
+**Make it executable:**
+```bash
 chmod +x pi_fortress.sh
+```
 
-# Run as root
+**Run as root:**
+```bash
 sudo ./pi_fortress.sh
 ```
 
@@ -102,37 +106,47 @@ The script will:
 The script keeps password authentication enabled initially. After setting up SSH keys, you should disable it.
 
 **On your local machine:**
+**Generate SSH key (if you don't have one):**
 ```bash
-# Generate SSH key (if you don't have one)
 ssh-keygen -t ed25519 -C "your_email@example.com"
+```
 
-# Copy to your Pi
+**Copy to your Pi:**
+```bash
 ssh-copy-id username@your-pi-ip
+```
 
-# Test it works
+**Test it works:**
+```bash
 ssh username@your-pi-ip
 ```
 
 **Once working, disable password authentication:**
+**Edit SSH configuration:**
 ```bash
-# On your Pi
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
+```
 
-# Uncomment this line:
+**Uncomment this line:**
+```
 PasswordAuthentication no
+```
 
-# Restart SSH
+**Restart SSH:**
+```bash
 sudo systemctl restart ssh
 ```
 
 ### 2. Reboot Your Pi
 
+**Reboot your Pi:**
 ```bash
 sudo reboot
 ```
 
 ### 3. Run Security Check
 
+**Run the security check:**
 ```bash
 sudo security-check.sh
 ```
@@ -180,38 +194,52 @@ This shows:
 
 ### Add Firewall Rules
 
+**Allow HTTP:**
 ```bash
-# Web server
 sudo ufw allow 80/tcp
+```
+
+**Allow HTTPS:**
+```bash
 sudo ufw allow 443/tcp
+```
 
-# Custom application
+**Allow custom application:**
+```bash
 sudo ufw allow 8080/tcp
+```
 
-# Check status
+**Check firewall status:**
+```bash
 sudo ufw status numbered
 ```
 
 ### Check Fail2Ban
 
+**View Fail2Ban status:**
 ```bash
-# View status
 sudo fail2ban-client status sshd
+```
 
-# See banned IPs
+**See banned IPs:**
+```bash
 sudo fail2ban-client status sshd | grep "Banned IP"
+```
 
-# Unban an IP
+**Unban an IP:**
+```bash
 sudo fail2ban-client set sshd unbanip 192.168.1.100
 ```
 
 ### Manual Security Scans
 
+**Run rootkit scan:**
 ```bash
-# Rootkit scan
 sudo rkhunter --check
+```
 
-# View auth log
+**View auth log:**
+```bash
 sudo tail -f /var/log/auth.log
 ```
 
@@ -242,12 +270,18 @@ sudo tail -f /var/log/auth.log
 ### Locked Out of SSH
 
 **Option 1: Physical Access**
+**Connect with keyboard and monitor, then:**
 ```bash
-# Connect keyboard/monitor
-# Login locally
-# Re-enable password auth
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-# Set: PasswordAuthentication yes
+```
+
+**Set this line:**
+```
+PasswordAuthentication yes
+```
+
+**Restart SSH:**
+```bash
 sudo systemctl restart ssh
 ```
 
@@ -260,18 +294,20 @@ sudo systemctl restart ssh
 
 ### My IP Got Banned
 
+**From another IP or local access:**
 ```bash
-# From another IP or local access
 sudo fail2ban-client set sshd unbanip YOUR_IP
 ```
 
 ### Port Not Working
 
+**Check firewall status:**
 ```bash
-# Check firewall
 sudo ufw status
+```
 
-# Allow the port
+**Allow the port:**
+```bash
 sudo ufw allow PORT_NUMBER/tcp
 ```
 
@@ -279,29 +315,64 @@ sudo ufw allow PORT_NUMBER/tcp
 
 ### Change SSH Port
 
+**Edit SSH config:**
 ```bash
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-# Add: Port 2222
+```
 
+**Add this line:**
+```
+Port 2222
+```
+
+**Update firewall:**
+```bash
 sudo ufw allow 2222/tcp
 sudo ufw delete allow 22/tcp
+```
+
+**Restart SSH:**
+```bash
 sudo systemctl restart ssh
 ```
 
 ### Enable Email Alerts
 
+**Install mail utilities:**
 ```bash
 sudo apt install mailutils
+```
+
+**Edit Fail2Ban config:**
+```bash
 sudo nano /etc/fail2ban/jail.local
-# Set: destemail = your@email.com
+```
+
+**Set your email:**
+```
+destemail = your@email.com
+```
+
+**Restart Fail2Ban:**
+```bash
 sudo systemctl restart fail2ban
 ```
 
 ### Disable IPv6
 
+**Edit sysctl config:**
 ```bash
 sudo nano /etc/sysctl.d/99-security.conf
-# Uncomment IPv6 disable lines
+```
+
+**Uncomment these lines:**
+```
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+```
+
+**Apply changes:**
+```bash
 sudo sysctl -p
 ```
 
