@@ -26,12 +26,12 @@
           <p class="hero-description">Comprehensive automated security hardening for Raspberry Pi. Hours of manual configuration, done in minutes. Lock it down.</p>
 
           <div class="hero-buttons">
-            <!--
-            <a href="https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh" download class="btn btn-primary">
+<!--
+            <a href="https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh" download class="btn btn-primary">
               <img src="icons/download.svg" alt="" class="icon">
               Download Script
             </a>
-            -->
+-->
             <a href="https://github.com/Sharonhazan/pi-fortress" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
               <img src="icons/terminal.svg" alt="" class="icon">
               View on GitHub
@@ -49,7 +49,7 @@
               <div class="terminal-title">pi@raspberrypi:~</div>
             </div>
             <div class="terminal-body">
-              <div class="terminal-line"><span class="prompt">$</span> sudo ./pi-fortress.sh</div>
+              <div class="terminal-line"><span class="prompt">$</span> sudo ./pi_fortress.sh</div>
               <div class="terminal-line output"><b>Starting Pi Fortress...</b></div>
               <div class="terminal-line output">✓ Updating system packages</div>
               <div class="terminal-line output">✓ Hardening SSH configuration</div>
@@ -86,7 +86,7 @@
         <div class="feature">
           <img src="icons/eye.svg" alt="" class="icon">
           <h3>Rootkit Detection</h3>
-          <p>rkhunter, chkrootkit, and AIDE file integrity monitoring</p>
+          <p>rkhunter and chkrootkit for comprehensive security scanning</p>
         </div>
 
         <div class="feature">
@@ -118,30 +118,30 @@
 
       <div class="code-blocks">
         <div class="code-block">
-          <button class="copy-btn" onclick="copyCommand(this, 'wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh')">
+          <button class="copy-btn" onclick="copyCommand(this, 'wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh')">
             <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
             <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
           </button>
           <pre><code><span class="comment"># Download Pi Fortress</span>
-wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh</code></pre>
+wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh</code></pre>
         </div>
 
         <div class="code-block">
-          <button class="copy-btn" onclick="copyCommand(this, 'chmod +x pi-fortress.sh')">
+          <button class="copy-btn" onclick="copyCommand(this, 'chmod +x pi_fortress.sh')">
             <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
             <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
           </button>
           <pre><code><span class="comment"># Make it executable</span>
-chmod +x pi-fortress.sh</code></pre>
+chmod +x pi_fortress.sh</code></pre>
         </div>
 
         <div class="code-block">
-          <button class="copy-btn" onclick="copyCommand(this, 'sudo ./pi-fortress.sh')">
+          <button class="copy-btn" onclick="copyCommand(this, 'sudo ./pi_fortress.sh')">
             <img src="icons/clipboard.svg" alt="Copy" class="icon copy-icon">
             <img src="icons/check.svg" alt="Copied" class="icon check-icon" style="display: none;">
           </button>
           <pre><code><span class="comment"># Run as root</span>
-sudo ./pi-fortress.sh</code></pre>
+sudo ./pi_fortress.sh</code></pre>
         </div>
       </div>
 
