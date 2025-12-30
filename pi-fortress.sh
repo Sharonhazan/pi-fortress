@@ -57,31 +57,7 @@ apt autoremove -y
 apt autoclean
 
 ###############################################################################
-# 2. CHANGE DEFAULT PASSWORD
-###############################################################################
-print_warning "Default password must be changed!"
-read -p "Do you want to change the password for user 'pi' now? (y/n): " change_pass
-if [ "$change_pass" = "y" ]; then
-    passwd pi
-    print_status "Password changed successfully"
-else
-    print_warning "SECURITY RISK: Default password not changed! Do this manually: passwd"
-fi
-
-###############################################################################
-# 3. CREATE NEW SUDO USER (OPTIONAL)
-###############################################################################
-read -p "Do you want to create a new admin user (recommended)? (y/n): " create_user
-if [ "$create_user" = "y" ]; then
-    read -p "Enter new username: " new_user
-    adduser "$new_user"
-    usermod -aG sudo "$new_user"
-    print_status "New user '$new_user' created with sudo privileges"
-    print_warning "After testing, consider disabling the default 'pi' user"
-fi
-
-###############################################################################
-# 4. SSH HARDENING
+# 2. SSH HARDENING
 ###############################################################################
 print_status "Hardening SSH configuration..."
 
@@ -422,29 +398,26 @@ echo "==========================================="
 echo ""
 print_warning "IMPORTANT NEXT STEPS:"
 echo ""
-echo "1. CHANGE DEFAULT PASSWORD (if not done already)"
-echo "   Run: passwd"
-echo ""
-echo "2. SET UP SSH KEY AUTHENTICATION"
+echo "1. SET UP SSH KEY AUTHENTICATION"
 echo "   Run: /root/setup_ssh_keys.sh for instructions"
 echo "   After setup, disable password authentication"
 echo ""
-echo "3. REBOOT to apply all changes"
+echo "2. REBOOT to apply all changes"
 echo "   Run: reboot"
 echo ""
-echo "4. REGULAR MAINTENANCE:"
+echo "3. REGULAR MAINTENANCE:"
 echo "   - Run security check: sudo security-check.sh"
 echo "   - Check fail2ban logs: sudo fail2ban-client status sshd"
 echo "   - Review system logs: sudo journalctl -xe"
 echo "   - Run rootkit scanner: sudo rkhunter --check"
 echo ""
-echo "5. ADDITIONAL SECURITY (OPTIONAL):"
+echo "4. ADDITIONAL SECURITY (OPTIONAL):"
 echo "   - Set up VPN (WireGuard or OpenVPN)"
 echo "   - Enable SELinux or AppArmor"
 echo "   - Configure intrusion detection (Snort/Suricata)"
 echo "   - Set up centralized logging"
 echo ""
-echo "6. FIREWALL RULES:"
+echo "5. FIREWALL RULES:"
 echo "   Add rules as needed: sudo ufw allow <port>"
 echo "   Example for web server: sudo ufw allow 80/tcp"
 echo ""
