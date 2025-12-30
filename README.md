@@ -61,14 +61,15 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 ### Installation
 
 ```bash
-# Download the script
-wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh
+wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh
+```
 
-# Make it executable
-chmod +x pi_fortress.sh
+```bash
+chmod +x pi-fortress.sh
+```
 
-# Run as root
-sudo ./pi_fortress.sh
+```bash
+sudo ./pi-fortress.sh
 ```
 
 ### What to Expect
@@ -105,25 +106,23 @@ The script keeps password authentication enabled initially. After setting up SSH
 
 **On your local machine:**
 ```bash
-# Generate SSH key (if you don't have one)
 ssh-keygen -t ed25519 -C "your_email@example.com"
+```
 
-# Copy to your Pi
+```bash
 ssh-copy-id username@your-pi-ip
+```
 
-# Test it works
+```bash
 ssh username@your-pi-ip
 ```
 
 **Once working, disable password authentication:**
 ```bash
-# On your Pi
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
+```
 
-# Uncomment this line:
-PasswordAuthentication no
-
-# Restart SSH
+```bash
 sudo systemctl restart ssh
 ```
 
@@ -183,40 +182,46 @@ This shows:
 ### Add Firewall Rules
 
 ```bash
-# Web server
 sudo ufw allow 80/tcp
+```
+
+```bash
 sudo ufw allow 443/tcp
+```
 
-# Custom application
+```bash
 sudo ufw allow 8080/tcp
+```
 
-# Check status
+```bash
 sudo ufw status numbered
 ```
 
 ### Check Fail2Ban
 
 ```bash
-# View status
 sudo fail2ban-client status sshd
+```
 
-# See banned IPs
+```bash
 sudo fail2ban-client status sshd | grep "Banned IP"
+```
 
-# Unban an IP
+```bash
 sudo fail2ban-client set sshd unbanip 192.168.1.100
 ```
 
 ### Manual Security Scans
 
 ```bash
-# Rootkit scan
 sudo rkhunter --check
+```
 
-# File integrity check
+```bash
 sudo aide --check
+```
 
-# View auth log
+```bash
 sudo tail -f /var/log/auth.log
 ```
 
@@ -248,11 +253,10 @@ sudo tail -f /var/log/auth.log
 
 **Option 1: Physical Access**
 ```bash
-# Connect keyboard/monitor
-# Login locally
-# Re-enable password auth
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-# Set: PasswordAuthentication yes
+```
+
+```bash
 sudo systemctl restart ssh
 ```
 
@@ -266,17 +270,16 @@ sudo systemctl restart ssh
 ### My IP Got Banned
 
 ```bash
-# From another IP or local access
 sudo fail2ban-client set sshd unbanip YOUR_IP
 ```
 
 ### Port Not Working
 
 ```bash
-# Check firewall
 sudo ufw status
+```
 
-# Allow the port
+```bash
 sudo ufw allow PORT_NUMBER/tcp
 ```
 
@@ -286,10 +289,17 @@ sudo ufw allow PORT_NUMBER/tcp
 
 ```bash
 sudo nano /etc/ssh/sshd_config.d/hardening.conf
-# Add: Port 2222
+```
 
+```bash
 sudo ufw allow 2222/tcp
+```
+
+```bash
 sudo ufw delete allow 22/tcp
+```
+
+```bash
 sudo systemctl restart ssh
 ```
 
@@ -297,8 +307,13 @@ sudo systemctl restart ssh
 
 ```bash
 sudo apt install mailutils
+```
+
+```bash
 sudo nano /etc/fail2ban/jail.local
-# Set: destemail = your@email.com
+```
+
+```bash
 sudo systemctl restart fail2ban
 ```
 
@@ -306,7 +321,9 @@ sudo systemctl restart fail2ban
 
 ```bash
 sudo nano /etc/sysctl.d/99-security.conf
-# Uncomment IPv6 disable lines
+```
+
+```bash
 sudo sysctl -p
 ```
 
