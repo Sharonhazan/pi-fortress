@@ -61,17 +61,17 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 **Download the script:**
 ```bash
-wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi_fortress.sh
+wget https://raw.githubusercontent.com/Sharonhazan/pi-fortress/main/pi-fortress.sh
 ```
 
 **Make it executable:**
 ```bash
-chmod +x pi_fortress.sh
+chmod +x pi-fortress.sh
 ```
 
 **Run as root:**
 ```bash
-sudo ./pi_fortress.sh
+sudo ./pi-fortress.sh
 ```
 
 ### What to Expect
