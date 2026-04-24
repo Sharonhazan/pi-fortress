@@ -57,6 +57,8 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 **Important:** This script is designed for Raspberry Pi OS installations configured with the Raspberry Pi Imager. Make sure you've set up your username, password, and SSH settings during the imaging process.
 
+**Compatibility:** Tested on Raspberry Pi OS Bookworm (current) and Bullseye. The script automatically detects the correct boot config path.
+
 ### Installation
 
 **Download the script:**
@@ -83,7 +85,9 @@ The script will:
 4. ✅ Set up UFW firewall
 5. ✅ Install security monitoring tools
 6. ✅ Apply network hardening
-7. ✅ Create security check script
+7. ✅ Set proper permissions
+8. ✅ Disable unused accounts
+9. ✅ Create security check script
 
 **Total time:** ~5-10 minutes (depending on your internet speed)
 
@@ -338,6 +342,8 @@ sudo systemctl restart ssh
 
 ### Enable Email Alerts
 
+**Note:** By default, email alerts in Fail2Ban are disabled because they require a mail server.
+
 **Install mail utilities:**
 ```bash
 sudo apt install mailutils
@@ -348,9 +354,11 @@ sudo apt install mailutils
 sudo nano /etc/fail2ban/jail.local
 ```
 
-**Set your email:**
-```
+**Set your email and action:**
+```ini
 destemail = your@email.com
+sendername = Fail2Ban
+action = %(action_mwl)s
 ```
 
 **Restart Fail2Ban:**

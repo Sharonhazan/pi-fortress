@@ -12,7 +12,7 @@
 # Repository: https://github.com/Sharonhazan/pi-fortress                       #
 # License: MIT                                                                 #
 #                                                                              #
-# Usage: sudo bash pi_fortress.sh                                              #
+# Usage: sudo bash pi-fortress.sh                                              #
 ################################################################################
 
 set -e  # Exit on error
@@ -61,8 +61,8 @@ apt autoclean
 ###############################################################################
 print_status "Hardening SSH configuration..."
 
-# Backup original SSH config
-cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+# Backup original SSH config (timestamped to preserve previous backups on re-runs)
+cp /etc/ssh/sshd_config "/etc/ssh/sshd_config.backup.$(date +%Y%m%d-%H%M%S)"
 
 # SSH Configuration
 cat > /etc/ssh/sshd_config.d/hardening.conf << 'EOF'
@@ -119,7 +119,7 @@ systemctl restart ssh
 print_status "SSH service restarted"
 
 ###############################################################################
-# 5. SETUP SSH KEY AUTHENTICATION HELPER
+# 3. SETUP SSH KEY AUTHENTICATION HELPER
 ###############################################################################
 cat > /root/setup_ssh_keys.sh << 'EOF'
 #!/bin/bash
@@ -142,7 +142,7 @@ chmod +x /root/setup_ssh_keys.sh
 print_status "SSH key setup helper created: /root/setup_ssh_keys.sh"
 
 ###############################################################################
-# 6. INSTALL AND CONFIGURE FAIL2BAN
+# 4. INSTALL AND CONFIGURE FAIL2BAN
 ###############################################################################
 print_status "Installing and configuring Fail2Ban..."
 apt install -y fail2ban
@@ -153,9 +153,10 @@ cat > /etc/fail2ban/jail.local << 'EOF'
 bantime = 3600
 findtime = 600
 maxretry = 5
-destemail = root@localhost
-sendername = Fail2Ban
-action = %(action_mwl)s
+# destemail and sendername commented out because no mail server is installed by default
+# destemail = root@localhost
+# sendername = Fail2Ban
+action = %(action_)s
 
 [sshd]
 enabled = true
@@ -171,7 +172,7 @@ systemctl start fail2ban
 print_status "Fail2Ban installed and configured"
 
 ###############################################################################
-# 7. CONFIGURE FIREWALL (UFW)
+# 5. CONFIGURE FIREWALL (UFW)
 ###############################################################################
 print_status "Setting up firewall (UFW)..."
 apt install -y ufw
@@ -190,38 +191,45 @@ systemctl enable ufw
 print_status "Firewall configured and enabled (SSH allowed)"
 
 ###############################################################################
-# 8. DISABLE UNNECESSARY SERVICES
+# 6. DISABLE UNNECESSARY SERVICES
 ###############################################################################
 print_status "Disabling unnecessary services..."
+
+# Determine Raspberry Pi boot config path (Bookworm uses /boot/firmware, older uses /boot)
+CONFIG_FILE="/boot/firmware/config.txt"
+if [ ! -f "$CONFIG_FILE" ]; then
+    CONFIG_FILE="/boot/config.txt"
+fi
 
 # Disable Bluetooth if not needed
 read -p "Disable Bluetooth? (y/n): " disable_bt
 if [ "$disable_bt" = "y" ]; then
     systemctl disable bluetooth
     systemctl stop bluetooth
-    echo "dtoverlay=disable-bt" >> /boot/firmware/config.txt
+    echo "dtoverlay=disable-bt" >> "$CONFIG_FILE"
     print_status "Bluetooth disabled"
 fi
 
 # Disable WiFi if using ethernet only
 read -p "Disable WiFi (only if using Ethernet)? (y/n): " disable_wifi
 if [ "$disable_wifi" = "y" ]; then
-    echo "dtoverlay=disable-wifi" >> /boot/firmware/config.txt
+    echo "dtoverlay=disable-wifi" >> "$CONFIG_FILE"
     print_status "WiFi disabled (takes effect after reboot)"
 fi
 
 ###############################################################################
-# 9. AUTOMATIC SECURITY UPDATES
+# 7. AUTOMATIC SECURITY UPDATES
 ###############################################################################
 print_status "Setting up automatic security updates..."
 apt install -y unattended-upgrades
 
 cat > /etc/apt/apt.conf.d/50unattended-upgrades << 'EOF'
 Unattended-Upgrade::Allowed-Origins {
+    "origin=Debian,codename=${distro_codename},label=Debian-Security";
+    "origin=Raspbian,codename=${distro_codename}";
+    "origin=Raspberry Pi Foundation,codename=${distro_codename}";
     "${distro_id}:${distro_codename}";
     "${distro_id}:${distro_codename}-security";
-    "${distro_id}ESMApps:${distro_codename}-apps-security";
-    "${distro_id}ESM:${distro_codename}-infra-security";
 };
 Unattended-Upgrade::AutoFixInterruptedDpkg "true";
 Unattended-Upgrade::MinimalSteps "true";
@@ -241,7 +249,7 @@ EOF
 print_status "Automatic security updates enabled"
 
 ###############################################################################
-# 10. SECURE SHARED MEMORY
+# 8. SECURE SHARED MEMORY
 ###############################################################################
 print_status "Securing shared memory..."
 if ! grep -q "tmpfs /run/shm tmpfs" /etc/fstab; then
@@ -250,7 +258,7 @@ if ! grep -q "tmpfs /run/shm tmpfs" /etc/fstab; then
 fi
 
 ###############################################################################
-# 11. INSTALL SECURITY TOOLS
+# 9. INSTALL SECURITY TOOLS
 ###############################################################################
 print_status "Installing security tools..."
 apt install -y \
@@ -259,10 +267,13 @@ apt install -y \
     logwatch \
     auditd
 
+# Update rkhunter file properties database to prevent initial false positives
+rkhunter --propupd || print_warning "rkhunter baseline update had warnings (safe to ignore on first run)"
+
 print_status "Security tools installed"
 
 ###############################################################################
-# 12. CONFIGURE SYSTEM LIMITS
+# 10. CONFIGURE SYSTEM LIMITS
 ###############################################################################
 print_status "Configuring system security limits..."
 cat >> /etc/security/limits.conf << 'EOF'
@@ -274,7 +285,7 @@ cat >> /etc/security/limits.conf << 'EOF'
 EOF
 
 ###############################################################################
-# 13. NETWORK SECURITY
+# 11. NETWORK SECURITY
 ###############################################################################
 print_status "Applying network security settings..."
 cat > /etc/sysctl.d/99-security.conf << 'EOF'
@@ -324,14 +335,16 @@ sysctl -p /etc/sysctl.d/99-security.conf
 print_status "Network security settings applied"
 
 ###############################################################################
-# 14. SET PROPER PERMISSIONS
+# 12. SET PROPER PERMISSIONS
 ###############################################################################
 print_status "Setting proper file permissions..."
 chmod 700 /root
-chmod 700 /home/*
+if [ -n "$(ls -A /home 2>/dev/null)" ]; then
+    chmod 700 /home/*
+fi
 
 ###############################################################################
-# 15. DISABLE UNUSED ACCOUNTS
+# 13. DISABLE UNUSED ACCOUNTS
 ###############################################################################
 print_status "Locking unused system accounts..."
 for user in games news uucp proxy www-data backup list irc gnats; do
@@ -341,7 +354,7 @@ for user in games news uucp proxy www-data backup list irc gnats; do
 done
 
 ###############################################################################
-# 16. CREATE SECURITY CHECK SCRIPT
+# 14. CREATE SECURITY CHECK SCRIPT
 ###############################################################################
 print_status "Creating security check script..."
 cat > /usr/local/bin/security-check.sh << 'EOF'
@@ -383,7 +396,7 @@ chmod +x /usr/local/bin/security-check.sh
 print_status "Security check script created: /usr/local/bin/security-check.sh"
 
 ###############################################################################
-# 17. SUMMARY AND RECOMMENDATIONS
+# 15. SUMMARY AND RECOMMENDATIONS
 ###############################################################################
 echo ""
 echo "==========================================="
