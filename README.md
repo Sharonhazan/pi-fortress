@@ -22,9 +22,9 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 ### 🛡️ Core Security
 - Automatic system updates with unattended security patches
-- Strong password enforcement
 - Secure file permissions and system limits
-- Unused account lockdown
+- Unused account lockdown (password locked and login shell removed)
+- Hardened shared memory mount options
 
 ### 🔐 SSH Hardening
 - Root login disabled
@@ -32,6 +32,7 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 - Key-based authentication support
 - Maximum 3 login attempts
 - Connection timeouts and session limits
+- Config validated before SSH is restarted, with automatic rollback if it fails
 
 ### 🔥 Network Protection
 - UFW firewall (default deny incoming)
@@ -47,9 +48,7 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 ### ⚙️ Optional Features
 - Disable Bluetooth (if not needed)
-- Disable WiFi (for Ethernet-only setups)
-- Create new admin user
-- Secure shared memory
+- Disable WiFi (for Ethernet-only setups, refused if you are connected over WiFi)
 
 ## 🚀 Quick Start
 
@@ -90,6 +89,14 @@ The script will:
 9. ✅ Create security check script
 
 **Total time:** ~5-10 minutes (depending on your internet speed)
+
+Each step is independent. If one fails the script says so, continues with the rest,
+and lists every failed or skipped step in the summary at the end, so you always know
+what was actually applied. Re-running the script is safe: no step duplicates the
+changes a previous run made.
+
+The two optional questions (Bluetooth and WiFi) are skipped automatically when the
+script runs without a terminal attached.
 
 ## 📋 What Gets Installed
 
@@ -172,7 +179,7 @@ This shows:
 ✓ Password auth: Enabled initially (disable after key setup)
 ✓ Max auth tries: 3
 ✓ Login timeout: 60 seconds
-✓ Idle timeout: 5 minutes
+✓ Idle timeout: 10 minutes (300s interval x 2 missed probes)
 ✓ Strong ciphers only
 ```
 
@@ -183,6 +190,7 @@ This shows:
 ✓ Ban duration: 2 hours
 ✓ Find time: 10 minutes
 ✓ Email alerts: Configurable
+✓ Log source: /var/log/auth.log, or the systemd journal when that file is absent
 ```
 
 ### Firewall Rules
@@ -190,9 +198,12 @@ This shows:
 ```
 ✓ Default incoming: DENY
 ✓ Default outgoing: ALLOW
-✓ SSH port 22: ALLOW
+✓ SSH: ALLOW, rate limited against brute force
 ✓ Custom ports: Easy to add
 ```
+
+The SSH rule is created for whichever port `sshd` is configured to listen on, so a
+custom port set before running the script is picked up automatically.
 
 ## 🔓 Common Tasks
 
