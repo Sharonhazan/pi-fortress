@@ -39,7 +39,7 @@
           </div>
         </div>
 
-   <div class="terminal-window">
+        <div class="terminal-window">
             <div class="terminal-header">
               <div class="terminal-buttons">
                 <span></span>
@@ -50,16 +50,16 @@
             </div>
             <div class="terminal-body">
               <div class="terminal-line"><span class="prompt">$</span> sudo ./pi-fortress.sh</div>
-              <div class="terminal-line output"><b>Starting Pi Fortress...</b></div>
-              <div class="terminal-line output">✓ Updating system packages</div>
-              <div class="terminal-line output">✓ Hardening SSH configuration</div>
-              <div class="terminal-line output">✓ Setting up UFW firewall</div>
-              <div class="terminal-line output">✓ Installing Fail2Ban</div>
-              <div class="terminal-line output">✓ Installing security tools</div>
-              <div class="terminal-line output">✓ Applying network hardening</div>
+              <div class="terminal-line output"><b>[+] Starting Raspberry Pi Security Hardening</b></div>
+              <div class="terminal-line output">[+] Updating system packages...</div>
+              <div class="terminal-line output">[+] Hardening SSH configuration...</div>
+              <div class="terminal-line output">[+] New SSH configuration validated</div>
+              <div class="terminal-line output">[+] Installing and configuring Fail2Ban...</div>
+              <div class="terminal-line output">[+] Setting up firewall (UFW)...</div>
+              <div class="terminal-line output">[+] Applying network security settings...</div>
+              <div class="terminal-line output"><b>[+] Security Hardening Complete!</b></div>
               <div class="terminal-line cursor"><span class="prompt">$</span> <span class="blink">_</span></div>
             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -74,13 +74,13 @@
         <div class="feature">
           <img src="icons/lock.svg" alt="" class="icon">
           <h3>SSH Hardening</h3>
-          <p>Root login disabled, strong encryption, key-based auth support</p>
+          <p>Root login disabled, strong encryption, key-based auth support. Validated before the restart, rolled back if it fails</p>
         </div>
 
         <div class="feature">
           <img src="icons/fire.svg" alt="" class="icon">
           <h3>Firewall & Fail2Ban</h3>
-          <p>UFW firewall with default deny, intrusion prevention enabled</p>
+          <p>UFW firewall with default deny, SSH rate limited, intrusion prevention enabled</p>
         </div>
 
         <div class="feature">
@@ -104,7 +104,7 @@
         <div class="feature">
           <img src="icons/wifi.svg" alt="" class="icon">
           <h3>Optional Disables</h3>
-          <p>Turn off Bluetooth and WiFi if not needed</p>
+          <p>Turn off Bluetooth and WiFi if not needed. WiFi is refused while you are connected over it</p>
         </div>
       </div>
     </div>
@@ -146,10 +146,13 @@
         <h3>What happens next</h3>
         <ul>
           <li><span class="bullet"></span> System packages get updated</li>
-          <li><span class="bullet"></span> SSH gets hardened with strong encryption</li>
-          <li><span class="bullet"></span> UFW firewall and Fail2Ban get configured</li>
+          <li><span class="bullet"></span> SSH gets hardened with strong encryption, then validated and restarted</li>
+          <li><span class="bullet"></span> Fail2Ban and the UFW firewall get configured</li>
+          <li><span class="bullet"></span> Automatic security updates get enabled</li>
           <li><span class="bullet"></span> Security monitoring tools are installed</li>
-          <li><span class="bullet"></span> Network hardening is applied</li>
+          <li><span class="bullet"></span> Network hardening, file permissions and system limits are applied</li>
+          <li><span class="bullet"></span> Unused system accounts are locked</li>
+          <li><span class="bullet"></span> Every step is listed in a summary at the end, and re-running is safe</li>
           <li><span class="bullet"></span> Reboot and you're done</li>
         </ul>
       </div>
