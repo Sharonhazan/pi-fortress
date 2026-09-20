@@ -231,7 +231,7 @@ step_update_system() {
 # 2. SSH HARDENING
 ###############################################################################
 step_ssh_hardening() {
-    local backup unit
+    local backup unit mode
     backup="${SSHD_CONFIG}.backup.$(date +%Y%m%d-%H%M%S)"
 
     # Backup original SSH config (timestamped to preserve previous backups on re-runs)
@@ -244,10 +244,11 @@ step_ssh_hardening() {
     # Without this check the hardening below can be silently ignored.
     if ! grep -Eqi "^[[:space:]]*Include[[:space:]]+${SSHD_CONFIG_DIR}/\*\.conf" "$SSHD_CONFIG"; then
         print_warning "$SSHD_CONFIG does not include $SSHD_CONFIG_DIR - adding the Include directive"
+        mode="$(stat -c '%a' "$SSHD_CONFIG")"
         printf 'Include %s/*.conf\n' "$SSHD_CONFIG_DIR" > "${SSHD_CONFIG}.tmp"
         cat "$SSHD_CONFIG" >> "${SSHD_CONFIG}.tmp"
         mv "${SSHD_CONFIG}.tmp" "$SSHD_CONFIG"
-        chmod 644 "$SSHD_CONFIG"
+        chmod "$mode" "$SSHD_CONFIG"
     fi
 
     # SSH Configuration
@@ -420,7 +421,7 @@ step_firewall() {
     # Allow SSH on whichever port(s) sshd listens on, rate limited against
     # brute force attempts
     for port in $(sshd_ports); do
-        ufw limit "$port/tcp" comment 'SSH (rate limited)'
+        ufw limit "$port/tcp"
         print_status "Firewall allows SSH on port $port (rate limited)"
     done
 
