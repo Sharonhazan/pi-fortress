@@ -53,8 +53,10 @@
               <div class="terminal-line output"><b>Starting Pi Fortress...</b></div>
               <div class="terminal-line output">✓ Updating system packages</div>
               <div class="terminal-line output">✓ Hardening SSH configuration</div>
-              <div class="terminal-line output">✓ Setting up UFW firewall</div>
+              <div class="terminal-line output">✓ Detected SSH port: 22</div>
+              <div class="terminal-line output">✓ SSH config validated, service restarted</div>
               <div class="terminal-line output">✓ Installing Fail2Ban</div>
+              <div class="terminal-line output">✓ Setting up UFW firewall</div>
               <div class="terminal-line output">✓ Installing security tools</div>
               <div class="terminal-line output">✓ Applying network hardening</div>
               <div class="terminal-line cursor"><span class="prompt">$</span> <span class="blink">_</span></div>
@@ -74,13 +76,13 @@
         <div class="feature">
           <img src="icons/lock.svg" alt="" class="icon">
           <h3>SSH Hardening</h3>
-          <p>Root login disabled, strong encryption, key-based auth support</p>
+          <p>Root login disabled, strong encryption, key-based auth support. The config is tested before sshd restarts, and reverted if it would not load</p>
         </div>
 
         <div class="feature">
           <img src="icons/fire.svg" alt="" class="icon">
-          <h3>Firewall & Fail2Ban</h3>
-          <p>UFW firewall with default deny, intrusion prevention enabled</p>
+          <h3>Firewall &amp; Fail2Ban</h3>
+          <p>UFW with default deny and rate-limited SSH on whichever port you actually use, plus Fail2Ban reading the journal or auth.log automatically</p>
         </div>
 
         <div class="feature">
@@ -98,13 +100,13 @@
         <div class="feature">
           <img src="icons/server.svg" alt="" class="icon">
           <h3>Network Hardening</h3>
-          <p>SYN flood protection, IP spoofing prevention, secure sysctl</p>
+          <p>SYN flood protection, IP spoofing prevention, secure sysctl, restricted kernel pointer and dmesg access</p>
         </div>
 
         <div class="feature">
           <img src="icons/wifi.svg" alt="" class="icon">
           <h3>Optional Disables</h3>
-          <p>Turn off Bluetooth and WiFi if not needed</p>
+          <p>Turn off Bluetooth and WiFi if not needed, or skip the prompts entirely with a flag</p>
         </div>
       </div>
     </div>
@@ -114,7 +116,7 @@
   <section class="installation">
     <div class="container">
       <h2>Quick start</h2>
-      <p class="installation-description">Configure your Pi with Raspberry Pi Imager first (set username, password, enable SSH). Then run these commands. Takes ~5-10 minutes.</p>
+      <p class="installation-description">Configure your Pi with Raspberry Pi Imager first (set username, password, enable SSH). Then run these commands. Takes ~5-10 minutes. The script prompts before disabling Bluetooth and WiFi — add <code>--no</code> to skip both prompts, or <code>--yes</code> to accept them, for an unattended run.</p>
 
       <div class="code-blocks">
         <div class="code-block">
@@ -146,12 +148,14 @@
         <h3>What happens next</h3>
         <ul>
           <li><span class="bullet"></span> System packages get updated</li>
-          <li><span class="bullet"></span> SSH gets hardened with strong encryption</li>
-          <li><span class="bullet"></span> UFW firewall and Fail2Ban get configured</li>
+          <li><span class="bullet"></span> SSH gets hardened with strong encryption, then the config is verified before the service restarts</li>
+          <li><span class="bullet"></span> UFW firewall and Fail2Ban get configured around your real SSH port</li>
           <li><span class="bullet"></span> Security monitoring tools are installed</li>
           <li><span class="bullet"></span> Network hardening is applied</li>
+          <li><span class="bullet"></span> <span>A full log is written to <code>/var/log/pi_security_hardening.log</code></span></li>
           <li><span class="bullet"></span> Reboot and you're done</li>
         </ul>
+        <p class="next-steps-note">Running it a second time is safe — it rewrites its own config files instead of appending to shared ones, so nothing gets duplicated.</p>
       </div>
     </div>
   </section>

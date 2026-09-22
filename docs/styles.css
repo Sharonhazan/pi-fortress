@@ -349,6 +349,18 @@ body {
   color: var(--muted);
 }
 
+.installation-description code,
+.next-steps code {
+  color: var(--accent);
+  font-size: 0.9em;
+}
+
+.next-steps-note {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
 .copy-btn {
   position: absolute;
   top: 1rem;
