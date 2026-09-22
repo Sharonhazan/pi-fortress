@@ -22,9 +22,9 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 ### 🛡️ Core Security
 - Automatic system updates with unattended security patches
-- Strong password enforcement
 - Secure file permissions and system limits
 - Unused account lockdown
+- Kernel hardening (restricted `dmesg` and kernel pointers)
 
 ### 🔐 SSH Hardening
 - Root login disabled
@@ -32,9 +32,10 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 - Key-based authentication support
 - Maximum 3 login attempts
 - Connection timeouts and session limits
+- Configuration validated with `sshd -t` and rolled back automatically if invalid
 
 ### 🔥 Network Protection
-- UFW firewall (default deny incoming)
+- UFW firewall (default deny incoming, SSH rate-limited)
 - Fail2Ban intrusion prevention
 - SYN flood protection
 - IP spoofing protection
@@ -48,7 +49,6 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 ### ⚙️ Optional Features
 - Disable Bluetooth (if not needed)
 - Disable WiFi (for Ethernet-only setups)
-- Create new admin user
 - Secure shared memory
 
 ## 🚀 Quick Start
@@ -57,7 +57,7 @@ This script transforms a fresh Raspberry Pi installation from default configurat
 
 **Important:** This script is designed for Raspberry Pi OS installations configured with the Raspberry Pi Imager. Make sure you've set up your username, password, and SSH settings during the imaging process.
 
-**Compatibility:** Tested on Raspberry Pi OS Bookworm (current) and Bullseye. The script automatically detects the correct boot config path.
+**Compatibility:** Tested on Raspberry Pi OS Bookworm (current) and Bullseye. The script detects the correct boot config path, the SSH port in use, whether Fail2Ban should read `auth.log` or the systemd journal, and it adds the `sshd_config.d` include directive if your image is missing it.
 
 ### Installation
 
@@ -76,20 +76,56 @@ chmod +x pi-fortress.sh
 sudo ./pi-fortress.sh
 ```
 
+### Options
+
+The script asks before disabling Bluetooth and WiFi. To run it without any prompts:
+
+| Flag | Effect |
+|------|--------|
+| `-y`, `--yes` | Answer yes to every optional prompt (disables Bluetooth and WiFi) |
+| `-n`, `--no` | Answer no to every optional prompt (leaves the radios on) |
+| `-h`, `--help` | Show usage and exit |
+
+```bash
+sudo ./pi-fortress.sh --no
+```
+
+The script is safe to re-run: it never duplicates entries in `/etc/fstab` or `config.txt`, and it writes its own drop-in files rather than appending to shared ones.
+
 ### What to Expect
 
 The script will:
 1. ✅ Update all system packages
-2. ✅ Configure SSH security settings
+2. ✅ Configure SSH security settings, verify them with `sshd -t`, then restart the service
 3. ✅ Install and configure Fail2Ban
 4. ✅ Set up UFW firewall
 5. ✅ Install security monitoring tools
-6. ✅ Apply network hardening
+6. ✅ Apply network and kernel hardening
 7. ✅ Set proper permissions
 8. ✅ Disable unused accounts
 9. ✅ Create security check script
+10. ✅ Record an rkhunter baseline so your first scan isn't full of false positives
 
 **Total time:** ~5-10 minutes (depending on your internet speed)
+
+Everything is logged to `/var/log/pi_security_hardening.log`. If a step fails, the script stops and tells you which line it stopped on rather than leaving you guessing.
+
+### What Gets Changed
+
+| Path | What it's for |
+|------|---------------|
+| `/etc/ssh/sshd_config.d/hardening.conf` | All SSH hardening settings |
+| `/etc/ssh/sshd_config.backup.<timestamp>` | Timestamped backup, one per run |
+| `/etc/fail2ban/jail.local` | Fail2Ban jail for SSH |
+| `/etc/sysctl.d/99-security.conf` | Network and kernel hardening |
+| `/etc/security/limits.d/99-pi-fortress.conf` | Core dump and process limits |
+| `/etc/apt/apt.conf.d/50unattended-upgrades` | Automatic security updates |
+| `/etc/fstab` | `noexec,nosuid,nodev` on `/dev/shm` |
+| `/boot/firmware/config.txt` (or `/boot/config.txt`) | Only if you opt into disabling Bluetooth or WiFi |
+| `/usr/local/bin/security-check.sh` | The security check command |
+| `/root/setup_ssh_keys.sh` | SSH key setup instructions |
+
+Settings live in their own drop-in files rather than being appended to shared ones, which is what makes re-running the script safe.
 
 ## 📋 What Gets Installed
 
@@ -156,11 +192,12 @@ sudo security-check.sh
 ```
 
 This shows:
-- Failed login attempts
+- Failed login attempts (from `auth.log` or the journal, whichever exists)
 - Fail2Ban status
 - Firewall rules
 - Recent logins
 - Open ports
+- Count of pending security updates
 - Rootkit scan
 
 ## 🛡️ Security Features Explained
@@ -176,6 +213,8 @@ This shows:
 ✓ Strong ciphers only
 ```
 
+These settings go in `/etc/ssh/sshd_config.d/hardening.conf`, which `sshd` only reads if `sshd_config` contains an `Include /etc/ssh/sshd_config.d/*.conf` line. Recent images ship with it; if yours doesn't, the script adds it, otherwise the hardening would be silently ignored. The config is then checked with `sshd -t` before the service restarts, and removed again if `sshd` rejects it.
+
 ### Fail2Ban Settings
 
 ```
@@ -185,14 +224,18 @@ This shows:
 ✓ Email alerts: Configurable
 ```
 
+On Bookworm, Debian no longer installs `rsyslog`, so `/var/log/auth.log` may not exist. The script detects this and points Fail2Ban at the systemd journal instead, which keeps the `sshd` jail working either way.
+
 ### Firewall Rules
 
 ```
 ✓ Default incoming: DENY
 ✓ Default outgoing: ALLOW
-✓ SSH port 22: ALLOW
+✓ SSH: ALLOW, rate-limited (6 connections / 30s per IP)
 ✓ Custom ports: Easy to add
 ```
+
+The script reads the port SSH is actually listening on (via `sshd -T`) and opens that one, so a Pi already moved off port 22 will not get locked out.
 
 ## 🔓 Common Tasks
 
@@ -247,6 +290,11 @@ sudo rkhunter --check
 sudo tail -f /var/log/auth.log
 ```
 
+If that file doesn't exist (Bookworm without `rsyslog`), read the journal instead:
+```bash
+sudo journalctl -u ssh -f
+```
+
 ## ⚠️ Important Warnings
 
 ### Before Running
@@ -267,7 +315,8 @@ sudo tail -f /var/log/auth.log
 
 ❌ **Disabling password auth without SSH keys** → Lockout  
 ❌ **Not allowing custom ports in UFW** → Services won't work  
-❌ **Forgetting to reboot** → Some changes won't apply
+❌ **Forgetting to reboot** → Some changes won't apply  
+❌ **Opening more than 6 SSH connections in 30 seconds** → UFW's rate limit blocks you temporarily; this trips up backup and deployment scripts that reconnect in a loop
 
 ## 🆘 Troubleshooting
 
@@ -315,6 +364,25 @@ sudo ufw status
 sudo ufw allow PORT_NUMBER/tcp
 ```
 
+### The Script Stopped Partway Through
+
+It prints the line number it stopped on and stops rather than continuing with a half-applied config. Check the log, fix the cause, and run it again — re-running is safe.
+
+```bash
+sudo tail -50 /var/log/pi_security_hardening.log
+```
+
+### Fail2Ban Isn't Banning Anything
+
+Confirm the jail is actually up. An empty or missing `sshd` jail usually means Fail2Ban can't find a log source:
+
+```bash
+sudo fail2ban-client status sshd
+sudo journalctl -u fail2ban -n 50
+```
+
+The script picks `backend = systemd` when `/var/log/auth.log` is absent. If you install `rsyslog` later, re-run the script so the jail switches back to the log file.
+
 ## 🎯 Advanced Configuration
 
 ### Change SSH Port
@@ -329,16 +397,18 @@ sudo nano /etc/ssh/sshd_config.d/hardening.conf
 Port 2222
 ```
 
-**Update firewall:**
+**Update firewall** (the script creates SSH as a rate-limited rule, so delete it with `limit`, not `allow`):
 ```bash
-sudo ufw allow 2222/tcp
-sudo ufw delete allow 22/tcp
+sudo ufw limit 2222/tcp
+sudo ufw delete limit 22/tcp
 ```
 
 **Restart SSH:**
 ```bash
 sudo systemctl restart ssh
 ```
+
+Re-running `pi-fortress.sh` afterwards will pick up the new port automatically for both the firewall and Fail2Ban.
 
 ### Enable Email Alerts
 
@@ -379,9 +449,9 @@ net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 ```
 
-**Apply changes:**
+**Apply changes** (`sysctl -p` on its own only reads `/etc/sysctl.conf`, so point it at the file):
 ```bash
-sudo sysctl -p
+sudo sysctl -e -p /etc/sysctl.d/99-security.conf
 ```
 
 ## 📚 Resources
